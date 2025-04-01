@@ -1,0 +1,31 @@
+# server配置
+server:
+  port: 8081
+
+# spring配置
+spring:
+  # baomidou可以动态切换jdbc数据源
+  datasource:
+    dynamic:
+      # 指定默认数据源
+      primary: mysql
+      # 严格模式：dao层不指定数据源直接报错,非严格模式允许dao层不配置数据源,会启动默认数据源进行连接
+      strict: false
+      # 数据源可以不止一个
+      datasource:
+        mysql:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/eshop?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&allowMultiQueries=true
+          username: root
+          password: Q-D37Sq*k61#yT_y
+
+# mybatis配置
+mybatis:
+  # settings
+  configuration:
+    # 日志实现,SLF4J/LOG4J2/STDOUT_LOGGING
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 将下划线映射成驼峰规则
+    map-underscore-to-camel-case: true
+    # 设置映射范围,NONE/PARTIAL/FULL
+    auto-mapping-behavior: full
