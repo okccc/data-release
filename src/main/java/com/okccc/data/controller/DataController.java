@@ -34,4 +34,12 @@ public class DataController {
         return Result.ok(data);
     }
 
+    // http://localhost:8081/queryAmountStats/2023-03-10
+    @Operation(summary = "查询clickhouse案例")
+    @GetMapping(value = "/queryAmountStats/{dt}")
+    public Result<JSONObject> queryAmountStats(@PathVariable("dt") String dt) {
+        JSONObject data = dataService.queryAmountStats(dt);
+        return Result.ok(data);
+    }
+
 }

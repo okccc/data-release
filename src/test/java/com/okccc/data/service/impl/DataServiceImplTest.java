@@ -23,4 +23,10 @@ class DataServiceImplTest {
         System.out.println(JSON.toJSONString(dataService.queryOrderStats("2023-03-10")));
     }
 
+    @Test
+    void queryAmountStats() {
+        // 查clickhouse
+        System.out.println(JSON.toJSONString(dataService.queryAmountStats("2023-03-10")));
+    }
+
 }

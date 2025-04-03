@@ -1,6 +1,7 @@
 package com.okccc.data.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.okccc.data.bean.AmountStats;
 import com.okccc.data.bean.OrderStats;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -26,4 +27,14 @@ public interface DataMapper {
             "GROUP BY DATE_FORMAT(dt,'%H:%i') " +
             "ORDER BY time")
     List<OrderStats> queryOrderStats(String dt);
+
+    // 从ck查询某一天各手机当日销售额
+    @DS("ck")
+    @Select("SELECT" +
+            "    brand," +
+            "    SUM(amount) amount " +
+            "FROM ods.di " +
+            "WHERE toDate(create_time) = #{dt} " +
+            "GROUP BY brand")
+    List<AmountStats> querySaleAmountStats(String dt);
 }

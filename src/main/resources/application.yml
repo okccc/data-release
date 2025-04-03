@@ -18,6 +18,11 @@ spring:
           url: jdbc:mysql://localhost:3306/eshop?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&allowMultiQueries=true
           username: root
           password: Q-D37Sq*k61#yT_y
+        ck:
+          driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+          url: jdbc:clickhouse://localhost:8123/ods
+          username:
+          password:
 
 # mybatis配置
 mybatis:

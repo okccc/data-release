@@ -76,4 +76,50 @@ public class DataServiceImpl implements DataService {
         return data;
     }
 
+    /**
+     * 2.从clickhouse查询各手机当日的销售额
+     *
+     * 模拟数据：
+     * CREATE table ods.di(create_time DateTime, brand String, amount Decimal(10,2))
+     * engine = ReplacingMergeTree(create_time) partition by toYYYYMMDD(create_time) order by (create_time);
+     * insert into ods.di values('2023-03-10 12:43:08', 'iphone', 5999);
+     * insert into ods.di values('2023-03-10 12:43:09', '华为', 4999);
+     * insert into ods.di values('2023-03-10 12:43:10', '小米', 3999);
+     * insert into ods.di values('2023-03-10 15:26:11', 'oppo', 2999);
+     * insert into ods.di values('2023-03-10 15:26:12', 'vivo', 1999);
+     * insert into ods.di values('2023-03-10 19:11:23', 'iphone', 6999);
+     * insert into ods.di values('2023-03-10 19:39:16', '华为', 5999);
+     * insert into ods.di values('2023-03-10 20:52:08', '小米', 4999);
+     * insert into ods.di values('2023-03-10 21:03:13', 'oppo', 3999);
+     *
+     * 响应数据：
+     * {"code":200,"message":"success","data":{"series":[{"name":"手机品牌","data":[8998,6998,12998,10998,4998]}],"categories":["小米","oppo","iphone","华为","vivo"]},"timestamp":1711452885144}
+     */
+    @Override
+    public JSONObject queryAmountStats(String dt) {
+        // 查询clickhouse
+        List<AmountStats> amountStats = dataMapper.querySaleAmountStats(dt);
+        System.out.println(amountStats);
+        // [AmountStats(brand=小米, amount=8998.0), AmountStats(brand=iphone, amount=12998.0), AmountStats(brand=华为, amount=10998.0)]
+
+        // []格式使用List封装：维度(手机品牌)、度量(销售额)
+        List<String> categories = new ArrayList<>();
+        List<Double> amount = new ArrayList<>();
+
+        // 遍历结果集
+        for (AmountStats amountStat : amountStats) {
+            categories.add(amountStat.getBrand());
+            amount.add(amountStat.getAmount());
+        }
+
+        // {}格式使用Bean封装
+        SeriesData<Double> seriesData = new SeriesData<>("手机品牌", amount);
+
+        // 封装data部分
+        JSONObject data = new JSONObject();
+        data.put("series", List.of(seriesData));
+        data.put("categories", categories);
+        return data;
+    }
+
 }
