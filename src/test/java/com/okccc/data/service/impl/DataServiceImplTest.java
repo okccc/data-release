@@ -29,4 +29,10 @@ class DataServiceImplTest {
         System.out.println(JSON.toJSONString(dataService.queryAmountStats("2023-03-10")));
     }
 
+    @Test
+    void queryCountryStats() {
+        // 查hive/presto
+        System.out.println(JSON.toJSONString(dataService.queryCountryStats(20240329L)));
+    }
+
 }

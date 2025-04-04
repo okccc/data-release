@@ -42,4 +42,12 @@ public class DataController {
         return Result.ok(data);
     }
 
+    // http://localhost:8081/queryCountryStats/20240329
+    @Operation(summary = "查询hive/presto案例")
+    @GetMapping(value = "/queryCountryStats/{dt}")
+    public Result<JSONObject> queryCountryStats(@PathVariable("dt") Long dt) {
+        JSONObject data = dataService.queryCountryStats(dt);
+        return Result.ok(data);
+    }
+
 }

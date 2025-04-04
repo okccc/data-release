@@ -14,4 +14,7 @@ public interface DataService {
 
     // 2.从clickhouse查询某一天各手机的销售额
     JSONObject queryAmountStats(String dt);
+
+    // 3.从hive/presto查询某一天各国家的访问量
+    JSONObject queryCountryStats(Long dt);
 }

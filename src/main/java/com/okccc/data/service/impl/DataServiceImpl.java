@@ -122,4 +122,36 @@ public class DataServiceImpl implements DataService {
         return data;
     }
 
+    /**
+     * 3.从hive/presto查询某一天各国家的访问量
+     *
+     * 返回数据：
+     * {"code":200,"message":"success","data":{"series":[{"name":"国家","data":[16334970,99221,25681,21788,18358]}],"categories":["中国","China mainland","日本","加拿大","美国"]},"timestamp":1711693622591}
+     */
+    public JSONObject queryCountryStats(Long dt) {
+        // 查询presto
+        List<CountryStats> countryStats = dataMapper.queryCountryStats(dt);
+        System.out.println(countryStats);
+        // [CountryStats(country=中国, count=99), CountryStats(country=日本, count=4), CountryStats(country=韩国, count=2)]
+
+        // []格式使用List封装：维度(国家)、度量(访问量)
+        List<String> categories = new ArrayList<>();
+        List<Integer> count = new ArrayList<>();
+
+        // 遍历结果集
+        for (CountryStats countryStat : countryStats) {
+            categories.add(countryStat.getCountry());
+            count.add(countryStat.getCount());
+        }
+
+        // {}格式使用Bean封装
+        SeriesData<Integer> seriesData = new SeriesData<>("国家", count);
+
+        // 封装data部分
+        JSONObject data = new JSONObject();
+        data.put("series", List.of(seriesData));
+        data.put("categories", categories);
+        return data;
+    }
+
 }

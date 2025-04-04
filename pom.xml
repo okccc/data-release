@@ -96,5 +96,47 @@
             <artifactId>clickhouse-jdbc</artifactId>
             <version>0.7.2</version>
         </dependency>
+
+        <!-- hive -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>3.1.3</version>
+            <exclusions>
+                <!-- Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts -->
+                <!-- 分析maven依赖 mvn dependency:tree -Dverbose -Dincludes=commons-logging,发下是hive-jdbc间接引入了该包,排除依赖即可 -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+
+                <!-- SLF4J: Class path contains multiple SLF4J providers. -->
+                <!-- SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@7219ec67] -->
+                <!-- SLF4J: Found provider [org.slf4j.reload4j.Reload4jServiceProvider@2dc54ad4] -->
+                <!-- SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@7219ec67] -->
+                <!-- slf4j包含多个日志绑定,默认是第一个加载的实现类生效,但是依靠ClassLoader加载顺序来保证显然不靠谱 -->
+                <!-- double shift在Classes搜索org.slf4j.reload4j.Reload4jServiceProvider,发现是org.slf4j:slf4j-reload4j和SpringBoot内置的logback冲突了 -->
+                <!-- 分析maven依赖 mvn dependency:tree -Dverbose -Dincludes=org.slf4j:slf4j-reload4j,发现是hive-jdbc间接引入了该包,排除依赖即可 -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+
+                <!-- Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat server -->
+                <!-- Caused by: jakarta.servlet.ServletException: Class [org.apache.jasper.servlet.JspServlet] is not a Servlet -->
+                <!-- Caused by: java.lang.ClassCastException: class org.apache.jasper.servlet.JspServlet cannot be cast to class jakarta.servlet.Servlet (org.apache.jasper.servlet.JspServlet and jakarta.servlet.Servlet are in unnamed module of loader 'app') -->
+                <!-- double shift在Classes搜索org.apache.jasper.servlet.JspServlet,发现是org.glassfish.web:javax.servlet.jsp和SpringBoot内置的tomcat冲突了 -->
+                <!-- 分析maven依赖 mvn dependency:tree -Dverbose -Dincludes=org.glassfish.web:javax.servlet.jsp,发现是hive-jdbc间接引入了该包,排除依赖即可 -->
+                <exclusion>
+                    <groupId>org.glassfish.web</groupId>
+                    <artifactId>javax.servlet.jsp</artifactId>
+                </exclusion>
+                <!-- 同上 -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-runner</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 </project>

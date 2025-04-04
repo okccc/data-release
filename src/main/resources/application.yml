@@ -23,6 +23,11 @@ spring:
           url: jdbc:clickhouse://localhost:8123/ods
           username:
           password:
+        hive:
+          driver-class-name: org.apache.hive.jdbc.HiveDriver
+          url: jdbc:hive2://localhost:10000
+          username: hive
+          password: 4XUY5mIg1dZlqVp2
 
 # mybatis配置
 mybatis:

@@ -1,6 +1,7 @@
 package com.okccc.data.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.okccc.data.bean.CountryStats;
 import com.okccc.data.bean.AmountStats;
 import com.okccc.data.bean.OrderStats;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,4 +38,17 @@ public interface DataMapper {
             "WHERE toDate(create_time) = #{dt} " +
             "GROUP BY brand")
     List<AmountStats> querySaleAmountStats(String dt);
+
+    // 从hive/presto查询某一天各国家的访问量
+    @DS("hive")
+//    @DS("presto")
+    @Select("SELECT" +
+            "    country," +
+            "    COUNT(1) count " +
+            "FROM ods.ods_access_log_realtime " +
+            "WHERE dt = #{dt} " +
+            "GROUP BY country " +
+            "ORDER BY count DESC " +
+            "LIMIT 5")
+    List<CountryStats> queryCountryStats(Long dt);
 }
