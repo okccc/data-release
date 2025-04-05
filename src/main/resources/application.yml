@@ -28,6 +28,11 @@ spring:
           url: jdbc:hive2://localhost:10000
           username: hive
           password: 4XUY5mIg1dZlqVp2
+        presto:
+          driver-class-name: com.facebook.presto.jdbc.PrestoDriver
+          url: jdbc:presto://localhost:9000/hive
+          username: hadoop
+          password:
 
 # mybatis配置
 mybatis:

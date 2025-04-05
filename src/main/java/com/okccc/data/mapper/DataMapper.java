@@ -40,8 +40,8 @@ public interface DataMapper {
     List<AmountStats> querySaleAmountStats(String dt);
 
     // 从hive/presto查询某一天各国家的访问量
-    @DS("hive")
-//    @DS("presto")
+//    @DS("hive")
+    @DS("presto")
     @Select("SELECT" +
             "    country," +
             "    COUNT(1) count " +
