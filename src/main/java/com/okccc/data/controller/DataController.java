@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @Author: okccc
  * @Date: 2024/3/20 16:48:07
@@ -47,6 +49,14 @@ public class DataController {
     @GetMapping(value = "/queryCountryStats/{dt}")
     public Result<JSONObject> queryCountryStats(@PathVariable("dt") Long dt) {
         JSONObject data = dataService.queryCountryStats(dt);
+        return Result.ok(data);
+    }
+
+    // http://localhost:8081/queryProvinceStats/2024-03-29
+    @Operation(summary = "查询hbase案例")
+    @GetMapping(value = "/queryProvinceStats/{dt}")
+    public Result<List<JSONObject>> queryProvinceStats(@PathVariable("dt") String dt) {
+        List<JSONObject> data = dataService.queryProvinceStats(dt);
         return Result.ok(data);
     }
 

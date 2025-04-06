@@ -4,6 +4,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.okccc.data.bean.CountryStats;
 import com.okccc.data.bean.AmountStats;
 import com.okccc.data.bean.OrderStats;
+import com.okccc.data.bean.ProvinceStats;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -51,4 +52,15 @@ public interface DataMapper {
             "ORDER BY count DESC " +
             "LIMIT 5")
     List<CountryStats> queryCountryStats(Long dt);
+
+    // 从hbase查询某一天各省份的订单数和销售额
+    @DS("hbase")
+    @Select("SELECT " +
+            "    PROVINCE," +
+            "    SUM(ORDER_COUNT) order_count," +
+            "    SUM(SALE_AMOUNT) sale_amount " +
+            "FROM ODS.DI " +
+            "WHERE substr(SALE_TIME,1,10) = #{dt} " +
+            "GROUP BY PROVINCE")
+    List<ProvinceStats> queryProvinceStats(String dt);
 }

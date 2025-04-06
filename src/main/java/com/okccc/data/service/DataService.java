@@ -2,6 +2,8 @@ package com.okccc.data.service;
 
 import com.alibaba.fastjson2.JSONObject;
 
+import java.util.List;
+
 /**
  * @Author: okccc
  * @Date: 2024/3/20 16:54:46
@@ -17,4 +19,7 @@ public interface DataService {
 
     // 3.从hive/presto查询某一天各国家的访问量
     JSONObject queryCountryStats(Long dt);
+
+    // 4.从hbase查询某一天各省份的订单数和销售额
+    List<JSONObject> queryProvinceStats(String dt);
 }

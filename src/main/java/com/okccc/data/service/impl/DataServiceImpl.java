@@ -154,4 +154,43 @@ public class DataServiceImpl implements DataService {
         return data;
     }
 
+    /**
+     * 4.从hbase查询各省份的订单数和销售额
+     *
+     * 模拟数据：
+     * create table if not exists ods.di(sale_time varchar primary key, brand varchar, province varchar, order_count integer, sale_amount float);
+     * upsert into ods.di values('2024-03-29 12:03:01', 'iphone', '上海市', 12, 69999.00);
+     * upsert into ods.di values('2024-03-29 15:03:01', '华为', '江苏省', 9, 59999.00);
+     * upsert into ods.di values('2024-03-29 19:03:01', '小米', '山东省', 11, 49999.00);
+     * upsert into ods.di values('2024-03-29 20:03:01', 'iphone', '上海市', 8, 39999.00);
+     * upsert into ods.di values('2024-03-29 21:03:01', '华为', '江苏省', 6, 29999.00);
+     * upsert into ods.di values('2024-03-29 22:03:01', '小米', '山东省', 6, 29999.00);
+     *
+     * 返回数据：
+     * {"code":200,"message":"success","data":[{"province":"上海市","order_count":20,"sale_amount":109998},{"province":"山东省","order_count":17,"sale_amount":79998},{"province":"江苏省","order_count":15,"sale_amount":89998}],"timestamp":1711705696199}
+     */
+    @Override
+    public List<JSONObject> queryProvinceStats(String dt) {
+        // 查询hbase
+        List<ProvinceStats> provinceStats = dataMapper.queryProvinceStats(dt);
+        System.out.println(provinceStats);
+        // [ProvinceStats(province=上海市, orderCount=20, saleAmount=109998.0), ProvinceStats(province=江苏省, orderCount=15, saleAmount=89998.0)]
+
+        // []格式使用List封装：data
+        List<JSONObject> data = new ArrayList<>();
+
+        // 遍历
+        for (ProvinceStats provinceStat : provinceStats) {
+            // {}格式使用JSONObject封装
+            JSONObject obj = new JSONObject();
+            obj.put("province", provinceStat.getProvince());
+            obj.put("order_count", provinceStat.getOrderCount());
+            obj.put("sale_amount", provinceStat.getSaleAmount());
+            data.add(obj);
+        }
+
+        // 响应数据
+        return data;
+    }
+
 }

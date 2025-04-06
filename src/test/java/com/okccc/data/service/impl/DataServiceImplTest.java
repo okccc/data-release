@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+
 /**
  * @Author: okccc
  * @Date: 2024/3/19 18:37:20
@@ -33,6 +35,13 @@ class DataServiceImplTest {
     void queryCountryStats() {
         // 查hive/presto
         System.out.println(JSON.toJSONString(dataService.queryCountryStats(20240329L)));
+    }
+
+    @Test
+    void queryProvinceStats() {
+        // 查hbase
+        System.out.println(JSON.toJSONString(dataService.queryProvinceStats(LocalDate.now().toString())));
+        System.out.println(JSON.toJSONString(dataService.queryProvinceStats("2024-03-29")));
     }
 
 }

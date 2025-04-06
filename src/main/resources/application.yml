@@ -33,6 +33,11 @@ spring:
           url: jdbc:presto://localhost:9000/hive
           username: hadoop
           password:
+        hbase:
+          driver-class-name: org.apache.phoenix.jdbc.PhoenixDriver
+          url: jdbc:phoenix:localhost:2181
+          username:
+          password:
 
 # mybatis配置
 mybatis:
