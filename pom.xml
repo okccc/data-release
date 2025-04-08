@@ -158,6 +158,18 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+
+                <!-- SLF4J: Class path contains multiple SLF4J providers. -->
+                <!-- SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@7219ec67] -->
+                <!-- SLF4J: Found provider [org.slf4j.reload4j.Reload4jServiceProvider@2dc54ad4] -->
+                <!-- SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@7219ec67] -->
+                <!-- slf4j包含多个日志绑定,默认是第一个加载的实现类生效,但是依靠ClassLoader加载顺序来保证显然不靠谱 -->
+                <!-- double shift在Classes搜索org.slf4j.reload4j.Reload4jServiceProvider,发现是org.slf4j:slf4j-reload4j和SpringBoot内置的logback冲突了 -->
+                <!-- 分析maven依赖 mvn dependency:tree -Dverbose -Dincludes=org.slf4j:slf4j-reload4j,发现是phoenix-spark间接引入了该包,排除依赖即可 -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
