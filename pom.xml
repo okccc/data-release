@@ -170,6 +170,16 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-reload4j</artifactId>
                 </exclusion>
+
+                <!-- Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat server -->
+                <!-- Caused by: jakarta.servlet.ServletException: Class [org.apache.jasper.servlet.JspServlet] is not a Servlet -->
+                <!-- Caused by: java.lang.ClassCastException: class org.apache.jasper.servlet.JspServlet cannot be cast to class jakarta.servlet.Servlet (org.apache.jasper.servlet.JspServlet and jakarta.servlet.Servlet are in unnamed module of loader 'app') -->
+                <!-- double shift在Classes搜索org.apache.jasper.servlet.JspServlet,发现是org.glassfish.web:javax.servlet.jsp和SpringBoot内置的tomcat冲突了 -->
+                <!-- 分析maven依赖 mvn dependency:tree -Dverbose -Dincludes=org.glassfish.web:javax.servlet.jsp,发现是phoenix-spark间接引入了该包,排除依赖即可 -->
+                <exclusion>
+                    <groupId>org.glassfish.web</groupId>
+                    <artifactId>javax.servlet.jsp</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
