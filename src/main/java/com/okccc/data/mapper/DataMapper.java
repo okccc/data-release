@@ -14,6 +14,11 @@ import java.util.List;
  * @Author: okccc
  * @Date: 2024/3/20 18:16:07
  * @Desc: Mapper接口的查询结果一行数据对应一个Bean对象
+ *
+ * hbase常见错误
+ * Caused by: java.sql.SQLException: ERROR 726 (43M10): Inconsistent namespace mapping properties. Cannot initiate
+ * connection as SYSTEM:CATALOG is found but client does not have phoenix.schema.isNamespaceMappingEnabled enabled
+ * 原因：phoenix不能直接操作schema,要在hbase-site.xml开启namespace映射权限
  */
 @Mapper
 public interface DataMapper {
