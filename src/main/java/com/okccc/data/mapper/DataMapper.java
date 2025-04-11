@@ -19,6 +19,11 @@ import java.util.List;
  * Caused by: java.sql.SQLException: ERROR 726 (43M10): Inconsistent namespace mapping properties. Cannot initiate
  * connection as SYSTEM:CATALOG is found but client does not have phoenix.schema.isNamespaceMappingEnabled enabled
  * 原因：phoenix不能直接操作schema,要在hbase-site.xml开启namespace映射权限
+ *
+ * Caused by: java.lang.ClassNotFoundException: com.google.protobuf.LiteralByteString
+ * 将jar包解压后看看是否包含当前报错类,如果包含那就是依赖冲突了,借助Maven Helper插件分析冲突jar包
+ * mvn dependency:tree -Dverbose -Dincludes=com.google.protobuf
+ * 分析依赖树发现mysql包的com.google.protobuf:protobuf-java:jar:3.11.4:compile导致hbase用不了,在mysql依赖添加exclusion去除
  */
 @Mapper
 public interface DataMapper {
