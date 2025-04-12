@@ -22,4 +22,7 @@ public interface DataService {
 
     // 4.从hbase查询某一天各省份的订单数和销售额
     List<JSONObject> queryProvinceStats(String dt);
+
+    // 5.从redis查询各手机的访问量
+    JSONObject queryVisitStatsTop3();
 }

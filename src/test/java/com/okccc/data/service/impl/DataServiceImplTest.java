@@ -44,4 +44,10 @@ class DataServiceImplTest {
         System.out.println(JSON.toJSONString(dataService.queryProvinceStats("2024-03-29")));
     }
 
+    @Test
+    void queryVisitStatsTop5() {
+        // 查redis
+        System.out.println(JSON.toJSONString(dataService.queryVisitStatsTop3()));
+    }
+
 }

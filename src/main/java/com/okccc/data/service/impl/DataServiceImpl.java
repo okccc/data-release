@@ -5,11 +5,15 @@ import com.okccc.data.bean.*;
 import com.okccc.data.mapper.DataMapper;
 import com.okccc.data.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: okccc
@@ -190,6 +194,48 @@ public class DataServiceImpl implements DataService {
         }
 
         // 响应数据
+        return data;
+    }
+
+    /**
+     * 5.从redis查询各手机访问量
+     *
+     * 模拟数据：
+     * ZADD hotPhone 169.0 iphone 166.0 华为 156.0 荣耀 161.0 小米 154.0 oppo 153.0 vivo
+     *
+     * 响应数据：
+     * {"code":200,"message":"success","data":{"series":[{"name":"手机品牌","data":[169,166,161]}],"categories":["iphone","华为","小米"]},"timestamp":1711449126604}
+     */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Value("${data.redis.key}")
+    String redisKey;
+
+    @Override
+    public JSONObject queryVisitStatsTop3() {
+        // 查询redis
+        Set<ZSetOperations.TypedTuple<String>> set = redisTemplate.opsForZSet().reverseRangeWithScores(redisKey, 0, 2);
+        System.out.println(set);
+        // [DefaultTypedTuple [score=169.0, value=iphone], DefaultTypedTuple [score=166.0, value=华为], DefaultTypedTuple [score=161.0, value=小米]]
+
+        // []格式使用List封装：维度(品牌)、度量(访问量)
+        List<String> categories = new ArrayList<>();
+        List<Double> brandScore = new ArrayList<>();
+
+        // 遍历结果集
+        for (ZSetOperations.TypedTuple<String> typedTuple : set) {
+            categories.add(typedTuple.getValue());
+            brandScore.add(typedTuple.getScore());
+        }
+
+        // {}格式使用Bean封装
+        SeriesData<Double> seriesData = new SeriesData<>("手机品牌", brandScore);
+
+        // 封装data部分
+        JSONObject data = new JSONObject();
+        data.put("series", List.of(seriesData));
+        data.put("categories", categories);
         return data;
     }
 

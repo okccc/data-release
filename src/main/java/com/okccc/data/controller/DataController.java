@@ -60,4 +60,12 @@ public class DataController {
         return Result.ok(data);
     }
 
+    // http://localhost:8081/queryVisitStatsTop3
+    @Operation(summary = "查询redis案例")
+    @GetMapping(value = "/queryVisitStatsTop3")
+    public Result<JSONObject> queryVisitStatsTop3() {
+        JSONObject data = dataService.queryVisitStatsTop3();
+        return Result.ok(data);
+    }
+
 }

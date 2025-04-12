@@ -38,6 +38,12 @@ spring:
           url: jdbc:phoenix:localhost:2181
           username:
           password:
+  # redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
 
 # mybatis配置
 mybatis:
@@ -49,3 +55,8 @@ mybatis:
     map-underscore-to-camel-case: true
     # 设置映射范围,NONE/PARTIAL/FULL
     auto-mapping-behavior: full
+
+# 自定义参数,代码中使用@Value("${}")注解引入
+data:
+  redis:
+    key: hotPhone
