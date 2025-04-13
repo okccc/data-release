@@ -2,10 +2,15 @@ package com.okccc.data.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.okccc.data.bean.*;
+import com.okccc.data.dao.ESDao;
 import com.okccc.data.mapper.DataMapper;
 import com.okccc.data.service.DataService;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -236,6 +241,102 @@ public class DataServiceImpl implements DataService {
         JSONObject data = new JSONObject();
         data.put("series", List.of(seriesData));
         data.put("categories", categories);
+        return data;
+    }
+
+    /**
+     * 6.从es查询不同渠道的访问量
+     *
+     * 模拟数据：
+     * {"id":0, "name":"Lucy", "sex":"女", "source":"直接访问", "profession":"保险"}
+     * {"id":1, "name":"Jack", "sex":"男", "source":"搜索引擎", "profession":"建筑"}
+     * {"id":2, "name":"Anna", "sex":"女", "source":"视频广告", "profession":"银行"}
+     * {"id":3, "name":"Blus", "sex":"男", "source":"搜索引擎", "profession":"保险"}
+     * {"id":4, "name":"Mary", "sex":"女", "source":"视频广告", "profession":"建筑"}
+     * {"id":5, "name":"Alex", "sex":"男", "source":"搜索引擎", "profession":"银行"}
+     *
+     * 响应数据：
+     * {"code":200,"data":[{"name":"搜索引擎","value":3},{"name":"直接访问","value":1},{"name":"视频广告","value":2}],"message":"success","timestamp":1711539120077}
+     */
+    @Autowired
+    private ESDao esDao;
+
+    @Override
+    public List<JSONObject> querySourceStats() {
+        // 封装聚合条件
+        TermsAggregationBuilder aggBuilder = AggregationBuilders.terms("sourceCount").field("source").size(10);
+        // 查询es
+        SearchHits<Customer> searchHits = esDao.queryAggFromES(aggBuilder, Customer.class);
+
+        // []格式使用List封装：data
+        List<JSONObject> data = new ArrayList<>();
+
+        // 遍历
+        Terms terms = searchHits.getAggregations().get("sourceCount");
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            JSONObject obj = new JSONObject();
+            obj.put("name", bucket.getKey());
+            obj.put("value", bucket.getDocCount());
+            data.add(obj);
+        }
+
+        // 响应数据
+        return data;
+    }
+
+    @Override
+    public JSONObject queryProfessionStats() {
+        // 封装聚合条件
+        TermsAggregationBuilder aggBuilder = AggregationBuilders
+                .terms("pc").field("profession").size(10)
+                .subAggregation(AggregationBuilders.terms("gc").field("sex").size(2));
+        // 查询es
+        SearchHits<Customer> searchHits = esDao.queryAggFromES(aggBuilder, Customer.class);
+
+        // []格式使用List封装：series、categories、data
+        List<Object> series = new ArrayList<>();
+        List<String> categories = new ArrayList<>();
+        List<Long> maleData = new ArrayList<>();
+        List<Long> femaleData = new ArrayList<>();
+
+        // 遍历
+        Terms terms = searchHits.getAggregations().get("pc");
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            categories.add(bucket.getKeyAsString());
+            Terms sexTerms = bucket.getAggregations().get("gc");
+            List<? extends Terms.Bucket> sexTermsBuckets = sexTerms.getBuckets();
+            // 计算男女比例
+            for (Terms.Bucket sexTermsBucket : sexTermsBuckets) {
+                if ("男".equals(sexTermsBucket.getKeyAsString())) {
+                    long percent = sexTermsBucket.getDocCount() * 100 / bucket.getDocCount();
+                    maleData.add(percent);
+                    femaleData.add(100 - percent);
+                }
+            }
+        }
+
+        // {}格式使用Bean封装
+        SeriesData<Long> seriesData01 = new SeriesData<>("男", maleData);
+        SeriesData<Long> seriesData02 = new SeriesData<>("女", femaleData);
+        series.add(seriesData01);
+        series.add(seriesData02);
+
+        // Bean的字段是固定的,想继续添加字段可以先转换成JSONObject
+//        JSONObject obj01 = JSON.parseObject(JSON.toJSONString(seriesData01));
+//        JSONObject obj02 = JSON.parseObject(JSON.toJSONString(seriesData02));
+//        obj01.put("unit", "%");
+//        obj02.put("unit", "%");
+//        series.add(obj01);
+//        series.add(obj02);
+
+        // 封装data部分
+        JSONObject data = new JSONObject();
+        data.put("series", series);
+        data.put("categories", categories);
+
+        // 响应数据
         return data;
     }
 

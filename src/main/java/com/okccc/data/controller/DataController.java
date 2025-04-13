@@ -68,4 +68,19 @@ public class DataController {
         return Result.ok(data);
     }
 
+    // http://localhost:8081/querySourceStats
+    @Operation(summary = "查询es案例")
+    @GetMapping(value = "querySourceStats")
+    public Result<List<JSONObject>> querySourceStats() {
+        List<JSONObject> data = dataService.querySourceStats();
+        return Result.ok(data);
+    }
+
+    // http://localhost:8081/queryProfessionStats
+    @GetMapping(value = "queryProfessionStats")
+    public Result<JSONObject> queryProfessionStats() {
+        JSONObject jsonObject = dataService.queryProfessionStats();
+        return Result.ok(jsonObject);
+    }
+
 }

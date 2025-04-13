@@ -25,4 +25,10 @@ public interface DataService {
 
     // 5.从redis查询各手机的访问量
     JSONObject queryVisitStatsTop3();
+
+    // 6.从es查询不同渠道的访问量
+    List<JSONObject> querySourceStats();
+
+    // 从es查询不同行业信息
+    JSONObject queryProfessionStats();
 }

@@ -50,4 +50,10 @@ class DataServiceImplTest {
         System.out.println(JSON.toJSONString(dataService.queryVisitStatsTop3()));
     }
 
+    @Test
+    void querySourceStats() {
+        // 查es
+        System.out.println(JSON.toJSONString(dataService.querySourceStats()));
+    }
+
 }
